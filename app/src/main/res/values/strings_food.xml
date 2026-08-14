@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Session list -->
+    <string name="food_capacity_format">%1$d of %2$d admitted</string>
+    <string name="food_remaining_format">%1$d left</string>
+
+    <!-- Scan screen stats header -->
+    <string name="food_seats_left">Seats left</string>
+    <string name="food_stat_placeholder">-</string>
+
+    <!-- Scan outcomes -->
+    <string name="food_already_detail_format">%1$s in %2$s</string>
+    <string name="food_one_scan_per_event">One food scan per attendee per event.</string>
+    <string name="food_wrong_event">That ticket belongs to a different event.</string>
+    <string name="food_session_closed">This session was closed. Go back and pick another.</string>
+    <string name="food_final_admitted_format">%1$d admitted</string>
+    <string name="food_scan_failed_fallback">Scan failed</string>
+</resources>

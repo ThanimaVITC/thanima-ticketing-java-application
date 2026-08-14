@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/scanner_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.legitcoconut.thanimaticketing.ui.ScanOverlayView
+        android:id="@+id/scanner_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Positioned in code from the real frame rectangle, so it always clears the window. -->
+    <TextView
+        android:id="@+id/scanner_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginHorizontal="32dp"
+        android:background="@drawable/scanner_hint_bg"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="9dp"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:theme="@style/ThemeOverlay.Material3.Dark"
+        android:textColor="?attr/colorOnSurface"
+        android:visibility="gone"
+        tools:text="Point the camera at the ticket QR"
+        tools:visibility="visible" />
+</merge>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Thanima Attendance</string>
+
+    <!-- Login -->
+    <string name="sign_in">Sign in</string>
+    <string name="welcome_line">Door duty, made quick.</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="server_url">Server URL</string>
+    <string name="server_url_helper">Leave as it is unless you were told otherwise.</string>
+    <string name="advanced">Server settings</string>
+    <string name="signing_in">Signing in</string>
+    <string name="err_email_required">Enter your email</string>
+    <string name="err_password_required">Enter your password</string>
+
+    <!-- Events -->
+    <string name="events">Events</string>
+    <string name="no_events">No events assigned to you yet.</string>
+    <string name="pull_to_refresh">Pull down to refresh</string>
+    <string name="profile">Profile</string>
+
+    <!-- Event detail -->
+    <string name="registrations">Registrations</string>
+    <string name="attendance">Attendance</string>
+    <string name="food_scans">Food scans</string>
+    <string name="in_pool">In pool</string>
+    <string name="unpaid">Unpaid</string>
+    <string name="actions">Actions</string>
+    <string name="scan_qr">Scan QR</string>
+    <string name="scan_qr_sub">Mark attendance by ticket</string>
+    <string name="verify_ticket">Verify ticket</string>
+    <string name="verify_ticket_sub">Look up without marking</string>
+    <string name="manual_attendance">Manual</string>
+    <string name="manual_attendance_sub">Find a name and mark present</string>
+    <string name="attendees">Attendees</string>
+    <string name="attendees_sub">Present and absent lists</string>
+    <string name="food_sessions">Food sessions</string>
+    <string name="food_sessions_sub">Meal sittings and capacity</string>
+    <string name="user_pool">User pool</string>
+    <string name="user_pool_sub">ID cards held right now</string>
+    <string name="pool_history">Pool history</string>
+    <string name="pool_history_sub">Every visit, including finished</string>
+    <string name="unpaid_list">Unpaid list</string>
+    <string name="unpaid_list_sub">People who still owe</string>
+    <string name="nfc_unavailable_tile">NFC unavailable on this device</string>
+
+    <!-- Scanner -->
+    <string name="point_at_qr">Point the camera at the ticket QR</string>
+    <string name="torch">Torch</string>
+    <string name="camera_permission_needed">Camera access is needed to scan tickets.</string>
+    <string name="grant_permission">Grant access</string>
+    <string name="marked_present">Marked present</string>
+    <string name="already_marked">Already marked</string>
+    <string name="ticket_valid">Valid ticket</string>
+    <string name="scan_next">Scan the next one</string>
+    <string name="scan_again">Scan again</string>
+
+    <!-- Attendance lists -->
+    <string name="search_name_reg_email">Search name, reg no or email</string>
+    <string name="present">Present</string>
+    <string name="absent">Absent</string>
+    <string name="all">All</string>
+    <string name="mark_present">Mark present</string>
+    <string name="marking">Marking</string>
+    <string name="nobody_here">Nobody here yet.</string>
+    <string name="no_match">Nothing matches that search.</string>
+
+    <!-- Food -->
+    <string name="admitted">Admitted</string>
+    <string name="session_full">Session is full</string>
+    <string name="near_limit">Near the limit</string>
+    <string name="start_scanning">Start scanning</string>
+    <string name="no_food_sessions">No open food sessions.</string>
+    <string name="already_ate">Already scanned for food</string>
+
+    <!-- Pool -->
+    <string name="add_to_pool">Add</string>
+    <string name="remove_from_pool">Remove</string>
+    <string name="pool_empty">Nobody has handed in a card.</string>
+    <string name="tap_card">Hold the ID card against the back of the phone</string>
+    <string name="reading_card">Reading card</string>
+    <string name="current">In pool now</string>
+    <string name="visits">Visits</string>
+    <string name="unique_users">People</string>
+    <string name="confirm_remove">Return the card</string>
+    <string name="pool_history_empty">No visits recorded yet.</string>
+
+    <!-- Unpaid -->
+    <string name="add_unpaid">Add someone</string>
+    <string name="name">Name</string>
+    <string name="reg_no">Registration number</string>
+    <string name="reg_no_hint">21BCE1234</string>
+    <string name="unpaid_empty">The unpaid list is empty.</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="done">Done</string>
+
+    <!-- Profile -->
+    <string name="log_out">Log out</string>
+    <string name="log_out_confirm">Log %1$s out of this device? The next person will have to sign in before any door can be worked.</string>
+    <string name="log_out_confirm_action">Yes, log out</string>
+    <string name="role">Role</string>
+    <string name="connected_to">Connected to</string>
+    <string name="nfc_status">NFC</string>
+
+    <!-- Generic -->
+    <string name="retry">Retry</string>
+    <string name="back">Back</string>
+    <string name="loading">Loading</string>
+    <string name="offline_hint">Every action needs the server. Check the connection and try again.</string>
+</resources>

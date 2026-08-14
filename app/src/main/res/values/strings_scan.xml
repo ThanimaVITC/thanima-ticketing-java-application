@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Extra strings for ScanFragment and VerifyTicketFragment, on top of the ones
+         already in strings.xml (scan_qr, verify_ticket, point_at_qr, torch,
+         camera_permission_needed, grant_permission, marked_present, already_marked,
+         ticket_valid, scan_next, scan_again). -->
+    <string name="scan_verification_failed">Verification failed</string>
+    <string name="scan_not_marked">Not marked yet</string>
+    <string name="scan_phone">Phone</string>
+    <string name="scan_event">Event</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Profile screen only. Everything else auth related already lives in strings.xml. -->
+    <string name="nfc_ready">Ready</string>
+    <string name="profile_fallback_name">Signed in</string>
+</resources>

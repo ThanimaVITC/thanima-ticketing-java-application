@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Marks which URL an ImageView is currently waiting on, so a recycled row does not
+         get the previous row's picture. -->
+    <item name="tag_image_url" type="id" />
+
+    <!-- Set once a list has played its entry animation, so a background refresh updates
+         the rows in place instead of replaying the whole list. -->
+    <item name="tag_list_animated" type="id" />
+</resources>

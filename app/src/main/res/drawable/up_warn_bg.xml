@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The "could not read this one" hint on the confirm step. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/scan_warn_container" />
+    <corners android:radius="12dp" />
+</shape>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Event detail -->
+    <string name="overview_title">Overview</string>
+    <string name="assign_tickets">Assign tickets</string>
+    <string name="assign_tickets_sub">Bind a physical ticket to a registration</string>
+
+    <!-- Stats: hero ring and chips -->
+    <string name="stat_food">Food</string>
+    <string name="still_to_arrive">still to arrive</string>
+
+    <!-- Feature pills on an event card -->
+    <string name="pill_food">Food</string>
+    <string name="pill_pool">Pool</string>
+    <string name="pill_unpaid">Unpaid</string>
+</resources>

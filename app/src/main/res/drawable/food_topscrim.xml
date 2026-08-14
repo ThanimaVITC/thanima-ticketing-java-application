@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark strip behind the overlaid toolbar and stats header so light text and icons
+     read on any background, camera image or the permission and full panels underneath. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="@color/scrim_camera"
+        android:endColor="@android:color/transparent" />
+</shape>

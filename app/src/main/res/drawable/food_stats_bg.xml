@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rounded translucent strip behind the admitted / left to limit / left to max header. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/scrim_camera" />
+    <corners android:radius="20dp" />
+</shape>

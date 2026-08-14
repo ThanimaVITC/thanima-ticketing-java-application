@@ -1,0 +1,41 @@
+# Secrets and machine specific paths. Never commit these.
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Build output
+.gradle/
+build/
+app/build/
+release-app/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# IDE
+*.iml
+.idea/
+.project
+.classpath
+.settings/
+captures/
+out/
+
+# Logs and crash reports
+*.log
+hs_err_pid*
+replay_pid*
+
+# OS junk
+.DS_Store
+Thumbs.db
+*~
+api-docs.md
+app-working.md

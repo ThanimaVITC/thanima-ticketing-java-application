@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Unpaid list -->
+    <string name="unpaid_count_suffix">unpaid</string>
+    <string name="unpaid_search_hint">Search name or reg no</string>
+    <string name="source_manual">Manual</string>
+    <string name="source_scanned">Scanned</string>
+    <string name="scan_id_card">Scan ID card</string>
+    <string name="unpaid_added_fmt">%1$s added</string>
+    <string name="unpaid_already_listed_fmt">%1$s is already on the list</string>
+    <string name="unpaid_add_error_fallback">Could not add this person</string>
+
+    <!-- ID card scan -->
+    <string name="unpaid_align_instruction">Line up the ID card inside the frame</string>
+    <string name="up_saving">Saving</string>
+    <string name="up_could_not_read">Could not read this one, type it in.</string>
+    <string name="retake">Retake</string>
+    <string name="scan_another">Scan another</string>
+    <string name="up_camera_permission_needed">Camera access is needed to scan ID cards.</string>
+    <string name="up_capture_failed">Could not capture. Try again.</string>
+    <string name="up_capture_desc">Capture</string>
+
+</resources>

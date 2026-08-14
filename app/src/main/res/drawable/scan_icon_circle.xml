@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Base shape for a result card header icon. Always recoloured in code with a
+     backgroundTintList before it is shown, so the solid colour here never actually shows. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/colorSurfaceVariant" />
+</shape>

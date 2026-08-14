@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Manual attendance -->
+    <string name="att_mark_present_message">Mark %1$s (%2$s) as present?</string>
+    <!-- Quoted so the leading space survives: it follows the count. -->
+    <string name="att_summary_suffix">" of %1$d present"</string>
+    <string name="att_all_present">Everyone is marked present.</string>
+    <string name="att_marked_present_fmt">%1$s marked present</string>
+
+    <!-- Attendees -->
+    <string name="att_tab_all_fmt">All (%1$d)</string>
+    <string name="att_tab_present_fmt">Present (%1$d)</string>
+    <string name="att_tab_absent_fmt">Absent (%1$d)</string>
+    <string name="att_present_empty">Nobody has been marked present yet.</string>
+    <string name="att_absent_empty">Everyone here has been marked present.</string>
+</resources>

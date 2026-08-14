@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The round shutter button on the ID card ALIGNING step. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="?attr/colorSurface" />
+    <stroke android:width="3dp" android:color="?attr/colorPrimary" />
+</shape>

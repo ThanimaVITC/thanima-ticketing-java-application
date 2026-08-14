@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Extra strings for AssignTicketFragment, on top of the ones already in strings.xml
+         (search_name_reg_email, nobody_here, no_match, camera_permission_needed,
+         grant_permission, torch, cancel). -->
+    <string name="assign_tickets_title">Assign tickets</string>
+    <string name="counts_suffix">" with a ticket, %1$d without"</string>
+
+    <string name="ticket_bound">Ticket bound</string>
+    <string name="tap_to_assign">Tap to assign</string>
+    <string name="reassign_confirm_message">This person already has a ticket bound. Assigning a new one replaces it.</string>
+
+    <string name="scanning_for">Scanning a ticket for %1$s</string>
+    <string name="hint_blank_ticket">Point the camera at the blank ticket QR</string>
+    <string name="pick_someone_else">Pick someone else</string>
+
+    <string name="ticket_already_assigned">This ticket is already assigned to %1$s</string>
+    <string name="assign_anyway">Assign anyway</string>
+
+    <string name="checking_ticket">Checking</string>
+    <string name="assigning_ticket">Assigning</string>
+
+    <string name="ticket_assigned_title">Ticket assigned</string>
+    <string name="assign_for_someone_else">Assign for someone else</string>
+    <string name="assign_another_to">Assign another to %1$s</string>
+</resources>
