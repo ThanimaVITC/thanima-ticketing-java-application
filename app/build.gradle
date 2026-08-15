@@ -16,8 +16,8 @@ android {
         applicationId 'com.legitcoconut.thanimaticketing'
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.2'
         buildConfigField 'String', 'DEFAULT_BASE_URL',
                 "\"${project.findProperty('BASE_URL') ?: 'https://ticketing.thanimavitc.site/api'}\""
 

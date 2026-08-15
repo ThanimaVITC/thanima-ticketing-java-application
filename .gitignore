@@ -9,6 +9,7 @@ keystore.properties
 build/
 app/build/
 release-app/
+releases/
 *.apk
 *.aab
 *.ap_
