@@ -37,7 +37,7 @@
     <style name="Theme.App.Splash" parent="Theme.App">
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowSplashScreenBackground" tools:targetApi="s">?attr/colorSurface</item>
-        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/ic_logo</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/ic_rambo</item>
     </style>
 
     <style name="Animation.App.Window" parent="@android:style/Animation.Activity">

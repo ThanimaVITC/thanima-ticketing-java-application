@@ -55,13 +55,13 @@
                             android:layout_height="match_parent"
                             android:background="@drawable/auth_circle" />
 
-                        <TextView
-                            android:id="@+id/tvInitials"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        <!-- Sized to the circle's inscribed square so no paw pokes out. -->
+                        <ImageView
+                            android:layout_width="62dp"
+                            android:layout_height="62dp"
                             android:layout_gravity="center"
-                            android:textAppearance="?attr/textAppearanceTitleLarge"
-                            android:textColor="?attr/colorOnPrimaryContainer" />
+                            android:src="@drawable/ic_rambo"
+                            android:contentDescription="@null" />
                     </FrameLayout>
 
                     <TextView

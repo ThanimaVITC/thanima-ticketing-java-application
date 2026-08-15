@@ -207,28 +207,28 @@ public class EventDetailFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         actionIndex = 0;
 
-        addAction(inflater, container, R.drawable.ic_qr_scan, getString(R.string.scan_qr),
+        addAction(inflater, container, R.drawable.ic_tile_scan, getString(R.string.scan_qr),
                 getString(R.string.scan_qr_sub), true,
                 () -> Nav.push(requireActivity(), ScanFragment.newInstance(eventId, eventTitle)));
 
-        addAction(inflater, container, R.drawable.ic_verified, getString(R.string.verify_ticket),
+        addAction(inflater, container, R.drawable.ic_tile_verify, getString(R.string.verify_ticket),
                 getString(R.string.verify_ticket_sub), true,
                 () -> Nav.push(requireActivity(), VerifyTicketFragment.newInstance(eventId, eventTitle)));
 
-        addAction(inflater, container, R.drawable.ic_touch, getString(R.string.manual_attendance),
+        addAction(inflater, container, R.drawable.ic_tile_manual, getString(R.string.manual_attendance),
                 getString(R.string.manual_attendance_sub), true,
                 () -> Nav.push(requireActivity(), ManualAttendanceFragment.newInstance(eventId, eventTitle)));
 
-        addAction(inflater, container, R.drawable.ic_people, getString(R.string.attendees),
+        addAction(inflater, container, R.drawable.ic_tile_attendees, getString(R.string.attendees),
                 getString(R.string.attendees_sub), true,
                 () -> Nav.push(requireActivity(), AttendeesFragment.newInstance(eventId, eventTitle)));
 
-        addAction(inflater, container, R.drawable.ic_add, getString(R.string.assign_tickets),
+        addAction(inflater, container, R.drawable.ic_tile_assign, getString(R.string.assign_tickets),
                 getString(R.string.assign_tickets_sub), true,
                 () -> Nav.push(requireActivity(), AssignTicketFragment.newInstance(eventId, eventTitle)));
 
         if (event.foodSessionsEnabled) {
-            addAction(inflater, container, R.drawable.ic_restaurant, getString(R.string.food_sessions),
+            addAction(inflater, container, R.drawable.ic_tile_food, getString(R.string.food_sessions),
                     getString(R.string.food_sessions_sub), true,
                     () -> Nav.push(requireActivity(), FoodSessionsFragment.newInstance(eventId, eventTitle)));
         }
@@ -236,17 +236,17 @@ public class EventDetailFragment extends Fragment {
         if (event.userPoolEnabled) {
             // A phone with no NFC can still work the pool if a Bluetooth reader is set up.
             boolean nfcOk = CardReaders.anyConfigured(requireContext());
-            addAction(inflater, container, R.drawable.ic_badge, getString(R.string.user_pool),
+            addAction(inflater, container, R.drawable.ic_tile_pool, getString(R.string.user_pool),
                     nfcOk ? getString(R.string.user_pool_sub) : getString(R.string.nfc_unavailable_tile), nfcOk,
                     () -> Nav.push(requireActivity(), PoolFragment.newInstance(eventId, eventTitle)));
 
-            addAction(inflater, container, R.drawable.ic_history, getString(R.string.pool_history),
+            addAction(inflater, container, R.drawable.ic_tile_history, getString(R.string.pool_history),
                     getString(R.string.pool_history_sub), true,
                     () -> Nav.push(requireActivity(), PoolHistoryFragment.newInstance(eventId, eventTitle)));
         }
 
         if (event.unpaidEnabled) {
-            addAction(inflater, container, R.drawable.ic_payments, getString(R.string.unpaid_list),
+            addAction(inflater, container, R.drawable.ic_tile_unpaid, getString(R.string.unpaid_list),
                     getString(R.string.unpaid_list_sub), true,
                     () -> Nav.push(requireActivity(), UnpaidFragment.newInstance(eventId, eventTitle)));
         }

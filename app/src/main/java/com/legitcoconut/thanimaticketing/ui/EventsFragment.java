@@ -47,7 +47,8 @@ public class EventsFragment extends Fragment {
 
         binding.toolbar.setTitle(R.string.events);
         MenuItem profile = binding.toolbar.getMenu().add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.profile);
-        profile.setIcon(R.drawable.ic_person);
+        profile.setIcon(R.drawable.ic_rambo);
+        profile.setIconTintList(null);  // The mascot brings its own colours.
         profile.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         profile.setOnMenuItemClickListener(item -> {
             Nav.push(requireActivity(), new ProfileFragment());

@@ -3,7 +3,7 @@
     <!-- Event detail -->
     <string name="overview_title">Overview</string>
     <string name="assign_tickets">Assign tickets</string>
-    <string name="assign_tickets_sub">Bind a physical ticket to a registration</string>
+    <string name="assign_tickets_sub">Bind physical tickets to reg</string>
 
     <!-- Stats: hero ring and chips -->
     <string name="stat_food">Food</string>

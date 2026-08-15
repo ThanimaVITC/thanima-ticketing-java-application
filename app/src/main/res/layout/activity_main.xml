@@ -22,7 +22,7 @@
             android:layout_width="112dp"
             android:layout_height="112dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/avd_logo_pulse" />
+            android:src="@drawable/ic_rambo" />
 
         <TextView
             android:layout_width="wrap_content"

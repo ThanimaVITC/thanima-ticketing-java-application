@@ -37,11 +37,4 @@ public final class User {
         }
     }
 
-    public String initials() {
-        if (name == null || name.trim().isEmpty()) return "?";
-        String[] parts = name.trim().split("\\s+");
-        String s = parts[0].substring(0, 1);
-        if (parts.length > 1) s += parts[parts.length - 1].substring(0, 1);
-        return s.toUpperCase();
-    }
 }

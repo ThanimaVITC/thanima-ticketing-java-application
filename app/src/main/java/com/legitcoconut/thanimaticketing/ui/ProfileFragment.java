@@ -66,14 +66,12 @@ public class ProfileFragment extends Fragment {
     private void bindUser() {
         User user = Api.cachedUser();
         if (user == null) {
-            binding.tvInitials.setText("?");
             binding.tvName.setText(R.string.profile_fallback_name);
             binding.tvEmail.setVisibility(View.GONE);
             binding.chipRole.setVisibility(View.GONE);
             binding.tvRoleValue.setText("-");
             return;
         }
-        binding.tvInitials.setText(user.initials());
         binding.tvName.setText(user.name.isEmpty() ? getString(R.string.profile_fallback_name) : user.name);
         if (user.email.isEmpty()) {
             binding.tvEmail.setVisibility(View.GONE);
