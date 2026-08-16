@@ -38,12 +38,11 @@
     <string name="food_sessions">Food sessions</string>
     <string name="food_sessions_sub">Meal sittings and capacity</string>
     <string name="user_pool">User pool</string>
-    <string name="user_pool_sub">ID cards held right now</string>
+    <string name="user_pool_sub">Who is in the pool right now</string>
     <string name="pool_history">Pool history</string>
     <string name="pool_history_sub">Every visit, including finished</string>
     <string name="unpaid_list">Unpaid list</string>
     <string name="unpaid_list_sub">People who still owe</string>
-    <string name="nfc_unavailable_tile">NFC unavailable on this device</string>
 
     <!-- Scanner -->
     <string name="point_at_qr">Point the camera at the ticket QR</string>
@@ -65,19 +64,18 @@
     <string name="marking">Marking</string>
     <string name="nobody_here">Nobody here yet.</string>
     <string name="no_match">Nothing matches that search.</string>
+    <string name="att_mark_failed">Could not mark attendance</string>
 
     <!-- Food -->
-    <string name="admitted">Admitted</string>
-    <string name="session_full">Session is full</string>
     <string name="near_limit">Near the limit</string>
     <string name="start_scanning">Start scanning</string>
     <string name="no_food_sessions">No open food sessions.</string>
-    <string name="already_ate">Already scanned for food</string>
+    <string name="already_ate">Already served</string>
 
     <!-- Pool -->
     <string name="add_to_pool">Add</string>
     <string name="remove_from_pool">Remove</string>
-    <string name="pool_empty">Nobody has handed in a card.</string>
+    <string name="pool_empty">Nobody is in the pool.</string>
     <string name="tap_card">Hold the ID card against the back of the phone</string>
     <string name="reading_card">Reading card</string>
     <string name="current">In pool now</string>
@@ -94,6 +92,7 @@
     <string name="unpaid_empty">The unpaid list is empty.</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="continue_label">Continue</string>
     <string name="close">Close</string>
     <string name="done">Done</string>
 
@@ -103,7 +102,6 @@
     <string name="log_out_confirm_action">Yes, log out</string>
     <string name="role">Role</string>
     <string name="connected_to">Connected to</string>
-    <string name="nfc_status">NFC</string>
 
     <!-- Generic -->
     <string name="retry">Retry</string>

@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Session list -->
-    <string name="food_capacity_format">%1$d of %2$d admitted</string>
+    <string name="food_capacity_format">%1$d of %2$d assigned</string>
     <string name="food_remaining_format">%1$d left</string>
+    <string name="food_session_at_cap">No seats left</string>
 
-    <!-- Scan screen stats header -->
-    <string name="food_seats_left">Seats left</string>
+    <!-- Slot picker, shown after every attendance mark -->
+    <string name="food_pick_slot">Pick a food slot</string>
+    <string name="food_attendee_format">%1$s · %2$s</string>
+    <string name="food_slot_full_format">%1$s full</string>
+    <string name="food_slot_assigned_format">Food slot: %1$s</string>
+    <string name="food_slot_taken_format">%1$s just filled up. Pick another.</string>
+    <string name="food_assign_failed">Could not assign a slot</string>
+    <string name="food_no_slots">No food slots are open right now.</string>
+    <string name="food_close_without_slot">Close without a slot</string>
+
+    <!-- Counter stats header -->
+    <string name="food_served_label">Served</string>
+    <string name="food_assigned_label">Assigned</string>
     <string name="food_stat_placeholder">-</string>
 
-    <!-- Scan outcomes -->
-    <string name="food_already_detail_format">%1$s in %2$s</string>
-    <string name="food_one_scan_per_event">One food scan per attendee per event.</string>
+    <!-- Counter outcomes -->
+    <string name="food_served">Served</string>
+    <string name="food_wrong_colour">Wrong colour</string>
+    <string name="food_belongs_to_format">Belongs to %1$s</string>
+    <string name="food_other_session">Belongs to another session.</string>
+    <string name="food_no_slot">No food slot</string>
+    <string name="food_no_slot_detail">This attendee was never given a colour.</string>
+    <string name="food_change_on_dashboard">Colours can only be changed on the dashboard.</string>
+    <string name="food_one_scan_per_event">One serving per attendee per event.</string>
     <string name="food_wrong_event">That ticket belongs to a different event.</string>
     <string name="food_session_closed">This session was closed. Go back and pick another.</string>
-    <string name="food_final_admitted_format">%1$d admitted</string>
     <string name="food_scan_failed_fallback">Scan failed</string>
 </resources>

@@ -19,6 +19,7 @@ import com.legitcoconut.thanimaticketing.databinding.FragmentManualAttendanceBin
 import com.legitcoconut.thanimaticketing.databinding.ItemRegistrationBinding;
 import com.legitcoconut.thanimaticketing.model.Registration;
 import com.legitcoconut.thanimaticketing.net.Api;
+import com.legitcoconut.thanimaticketing.net.Res;
 import com.legitcoconut.thanimaticketing.util.Ui;
 
 import java.util.ArrayList;
@@ -157,32 +158,53 @@ public class ManualAttendanceFragment extends Fragment {
         int startIdx = visible.indexOf(r);
         if (startIdx >= 0) adapter.notifyItemChanged(startIdx);
 
-        Api.markAttendance(eventId, r.email, (value, error) -> {
+        Api.markAttendance(eventId, r.email, (res, error) -> {
             if (binding == null) return;
             marking.remove(r.id);
             int idx = visible.indexOf(r);
 
             if (error != null) {
-                // A duplicate is the server telling us they are already present.
-                if (error.toLowerCase(Locale.US).contains("already")) {
-                    r.attended = true;
-                    removeRow(idx);
-                    updateSummary();
-                } else if (idx >= 0) {
-                    adapter.notifyItemChanged(idx);
-                }
+                if (idx >= 0) adapter.notifyItemChanged(idx);
                 Ui.feedback(requireContext(), false);
                 Ui.error(binding.getRoot(), error);
                 return;
             }
 
+            if (!res.ok()) {
+                // A duplicate is the server telling us they are already present. They may
+                // still be owed a food colour, so the picker is offered all the same.
+                if (res.flag("alreadyMarked")) {
+                    r.attended = true;
+                    removeRow(idx);
+                    updateSummary();
+                    offerFoodSlot(res, r);
+                } else if (idx >= 0) {
+                    adapter.notifyItemChanged(idx);
+                }
+                Ui.feedback(requireContext(), false);
+                Ui.error(binding.getRoot(), res.error(getString(R.string.att_mark_failed)));
+                return;
+            }
+
             r.attended = true;
-            r.markedAt = value.optString("markedAt", null);
+            r.markedAt = res.obj("attendance").optString("markedAt", null);
             Ui.feedback(requireContext(), true);
             Ui.snack(binding.getRoot(), getString(R.string.att_marked_present_fmt, r.name));
             updateSummary();
             removeRow(idx);
+            offerFoodSlot(res, r);
         });
+    }
+
+    /** The door assigns a colour whichever way someone is marked present, tap or scan. */
+    private void offerFoodSlot(Res res, Registration r) {
+        FoodSlotSheet.showIfNeeded(getParentFragmentManager(), eventId,
+                res.data.optJSONObject("food"), r.name, r.regNo, r.email,
+                (colorName, colorInt) -> {
+                    if (binding == null) return;
+                    Ui.snack(binding.getRoot(), getString(R.string.food_slot_assigned_format, colorName));
+                },
+                null);
     }
 
     /** Present people are not on this screen, so marking someone slides them out of the list. */

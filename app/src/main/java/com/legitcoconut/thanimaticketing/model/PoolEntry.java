@@ -12,7 +12,6 @@ public final class PoolEntry {
     public final String regNo;
     public final String email;
     public final String phone;
-    public final String nfcId;
     public final String enteredAt;
     public final String exitedAt;
     private final long serverDurationMs;
@@ -25,7 +24,6 @@ public final class PoolEntry {
         regNo = o.optString("regNo", "");
         email = o.optString("email", "");
         phone = o.isNull("phone") ? null : o.optString("phone", null);
-        nfcId = o.optString("nfcId", "");
         enteredAt = o.isNull("enteredAt") ? null : o.optString("enteredAt", null);
         exitedAt = o.isNull("exitedAt") ? null : o.optString("exitedAt", null);
         serverDurationMs = o.optLong("durationMs", 0L);

@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Remove sheet -->
-    <string name="pool_entered_label">Entered %1$s</string>
-    <string name="pool_held_label">Held for %1$s</string>
-    <string name="pool_removing">Returning the card</string>
-    <string name="pool_returned">%1$s returned after %2$s</string>
-    <string name="pool_not_found">This ID card is not in the pool</string>
-    <string name="pool_already_removed">This user is no longer in the pool</string>
-    <string name="pool_remove_failed">Could not remove this entry</string>
-
-    <!-- Add flow (PoolAddFragment) -->
-    <string name="pool_verifying">Verifying ticket</string>
+    <!-- Scan flow (PoolScanFragment), shared by both add and remove -->
+    <string name="pool_add">Add to pool</string>
+    <string name="pool_remove">Remove from pool</string>
+    <string name="pool_add_action">Add to pool</string>
+    <string name="pool_remove_action">Remove from pool</string>
+    <string name="pool_add_another">Add another</string>
+    <string name="pool_remove_another">Remove another</string>
+    <string name="pool_verifying">Looking up ticket</string>
+    <string name="pool_adding">Saving</string>
     <string name="pool_already_attended">Already marked present</string>
     <string name="pool_not_attended">Not marked present yet</string>
-    <string name="continue_label">Continue</string>
-    <string name="scan_different_ticket">Scan a different ticket</string>
-    <string name="pool_adding">Adding to the pool</string>
-    <string name="pool_card_taken">Card taken</string>
-    <string name="pool_now_holding">Now holding %1$d cards</string>
+    <string name="pool_in_for">In the pool for %1$s</string>
+
+    <!-- Outcomes -->
+    <string name="pool_added">Added to the pool</string>
+    <string name="pool_removed">Removed from the pool</string>
+    <string name="pool_now_holding">%1$d in the pool now</string>
+    <string name="pool_stay_length">Stayed %1$s</string>
+    <string name="pool_held_label">In for %1$s</string>
     <string name="pool_already_in_pool">%1$s is already in the pool</string>
-    <string name="pool_card_in_use">That card is held by %1$s (%2$s)</string>
+    <string name="pool_not_in_pool">This person is not in the pool</string>
+    <string name="pool_not_in_pool_named">%1$s is not in the pool</string>
+    <string name="pool_already_removed">This user is no longer in the pool</string>
     <string name="pool_wrong_event">That ticket belongs to a different event.</string>
     <string name="pool_add_failed">Could not add this person to the pool</string>
-    <string name="add_another">Add another</string>
+    <string name="pool_remove_failed">Could not remove this entry</string>
 
     <!-- Pool history -->
+    <string name="pool_entered_label">Entered %1$s</string>
     <string name="pool_in_at">In %1$s</string>
     <string name="pool_out_at">Out %1$s</string>
 </resources>

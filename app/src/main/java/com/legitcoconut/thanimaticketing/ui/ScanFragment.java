@@ -23,6 +23,7 @@ import com.legitcoconut.thanimaticketing.MainActivity;
 import com.legitcoconut.thanimaticketing.R;
 import com.legitcoconut.thanimaticketing.databinding.FragmentScanBinding;
 import com.legitcoconut.thanimaticketing.net.Api;
+import com.legitcoconut.thanimaticketing.net.Res;
 import com.legitcoconut.thanimaticketing.util.Ui;
 
 import org.json.JSONObject;
@@ -121,14 +122,47 @@ public class ScanFragment extends Fragment {
     private void onQr(String value) {
         if (binding == null) return;
         binding.scanner.pauseScanning();
-        Api.verifyQrAttendance(value, eventId, (attendance, error) -> {
+        Api.verifyQrAttendance(value, eventId, (res, error) -> {
             if (binding == null) return;
-            if (attendance != null) {
-                showSuccess(attendance);
-            } else {
+            if (error != null) {
                 showFailure(error);
+                return;
+            }
+            if (res.ok()) {
+                JSONObject attendance = res.obj("attendance");
+                showSuccess(attendance);
+                offerFoodSlot(res, attendance.optString("name"), attendance.optString("regNo"),
+                        attendance.optString("email"));
+            } else {
+                showFailure(res.error(getString(R.string.scan_verification_failed)));
+                // Already marked, but possibly still without a colour — the food block rides
+                // along on the 409 precisely so a re-scan can finish the job.
+                JSONObject attendee = res.obj("attendee");
+                offerFoodSlot(res, attendee.optString("name"), attendee.optString("regNo"),
+                        attendee.optString("email"));
             }
         });
+    }
+
+    /**
+     * Marking someone present is only half the job when food sessions are running. The
+     * camera stays paused for as long as the picker is up, otherwise the next ticket in the
+     * queue would be read straight through the sheet.
+     */
+    private void offerFoodSlot(Res res, String name, String regNo, String email) {
+        boolean shown = FoodSlotSheet.showIfNeeded(getParentFragmentManager(), eventId,
+                res.data.optJSONObject("food"), name, regNo, email,
+                (colorName, colorInt) -> {
+                    if (binding == null) return;
+                    binding.resultMeta.setText(getString(R.string.food_slot_assigned_format, colorName));
+                    binding.resultMeta.setTextColor(colorInt);
+                    binding.resultMeta.setVisibility(View.VISIBLE);
+                },
+                () -> {
+                    if (binding == null) return;
+                    handler.postDelayed(this::hideAndResume, 1500);
+                });
+        if (shown) handler.removeCallbacksAndMessages(null);
     }
 
     private void showSuccess(JSONObject attendance) {

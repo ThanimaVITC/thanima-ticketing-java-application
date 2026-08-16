@@ -18,14 +18,6 @@ public final class Store {
     public static final String KEY_SERVER_URL = "server_url";
     public static final String KEY_USER = "auth_user";
 
-    // Which card reader this phone uses. Deliberately survives logout: a door phone paired
-    // to a reader is still paired to it when the next shift signs in.
-    public static final String KEY_READER_SOURCE = "reader_source";
-    public static final String KEY_READER_PROTOCOL = "reader_protocol";
-    public static final String KEY_READER_MAC = "reader_mac";
-    public static final String KEY_READER_NAME = "reader_name";
-    public static final String KEY_READER_REVERSE = "reader_reverse";
-
     private static SharedPreferences prefs;
 
     private Store() {

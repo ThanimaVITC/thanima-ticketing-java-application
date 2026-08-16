@@ -1,6 +1,7 @@
 package com.legitcoconut.thanimaticketing.ui;
 
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +69,8 @@ public class FoodSessionsFragment extends Fragment {
         if (eventTitle != null && !eventTitle.isEmpty()) binding.toolbar.setSubtitle(eventTitle);
 
         adapter = new FoodAdapter(session ->
-                Nav.push(requireActivity(), FoodScanFragment.newInstance(eventId, session.id, session.name)));
+                Nav.push(requireActivity(), FoodScanFragment.newInstance(
+                        eventId, session.id, session.colorName, session.colorInt)));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(adapter);
 
@@ -161,11 +163,18 @@ public class FoodSessionsFragment extends Fragment {
             }
 
             void bind(FoodSession s, Consumer<FoodSession> onClick) {
-                binding.tvName.setText(s.name);
+                binding.tvName.setText(s.colorName);
                 binding.tvCapacity.setText(binding.getRoot().getContext()
                         .getString(R.string.food_capacity_format, s.admitted, s.maxLimit));
                 binding.progress.setProgressCompat(s.percentOfMax(), true);
 
+                GradientDrawable dot = new GradientDrawable();
+                dot.setShape(GradientDrawable.OVAL);
+                dot.setColor(s.colorInt);
+                binding.colorDot.setBackground(dot);
+
+                // The bar carries the session's own colour, so the card reads as that colour
+                // at a glance. Full and near-limit still override, because those matter more.
                 int indicatorColor;
                 if (s.full) {
                     indicatorColor = MaterialColors.getColor(binding.getRoot(),
@@ -173,13 +182,12 @@ public class FoodSessionsFragment extends Fragment {
                 } else if (s.nearLimit) {
                     indicatorColor = binding.getRoot().getContext().getColor(R.color.scan_warn);
                 } else {
-                    indicatorColor = MaterialColors.getColor(binding.getRoot(),
-                            com.google.android.material.R.attr.colorPrimary);
+                    indicatorColor = s.colorInt;
                 }
                 binding.progress.setIndicatorColor(indicatorColor);
 
                 if (s.full) {
-                    binding.chipStatus.setText(R.string.session_full);
+                    binding.chipStatus.setText(R.string.food_session_at_cap);
                     tintChip(binding.chipStatus,
                             MaterialColors.getColor(binding.getRoot(),
                                     com.google.android.material.R.attr.colorErrorContainer),
@@ -200,17 +208,13 @@ public class FoodSessionsFragment extends Fragment {
                                     com.google.android.material.R.attr.colorOnSurfaceVariant));
                 }
 
-                if (s.full) {
-                    binding.card.setClickable(false);
-                    binding.card.setFocusable(false);
-                    binding.card.setOnClickListener(null);
-                    binding.card.setAlpha(0.6f);
-                } else {
-                    binding.card.setClickable(true);
-                    binding.card.setFocusable(true);
-                    binding.card.setAlpha(1f);
-                    binding.card.setOnClickListener(v -> onClick.accept(s));
-                }
+                // Every open session leads to its counter. A colour being full means no more
+                // people can be *given* it at the door — the ones who already hold it still
+                // have to be fed, so this is exactly when the counter gets used.
+                binding.card.setClickable(true);
+                binding.card.setFocusable(true);
+                binding.card.setAlpha(1f);
+                binding.card.setOnClickListener(v -> onClick.accept(s));
             }
 
             private void tintChip(Chip chip, int background, int text) {

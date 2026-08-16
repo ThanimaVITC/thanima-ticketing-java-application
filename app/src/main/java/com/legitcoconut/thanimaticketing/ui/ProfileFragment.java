@@ -15,7 +15,6 @@ import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.legitcoconut.thanimaticketing.MainActivity;
 import com.legitcoconut.thanimaticketing.R;
-import com.legitcoconut.thanimaticketing.card.CardReaders;
 import com.legitcoconut.thanimaticketing.databinding.FragmentProfileBinding;
 import com.legitcoconut.thanimaticketing.model.User;
 import com.legitcoconut.thanimaticketing.net.Api;
@@ -42,25 +41,12 @@ public class ProfileFragment extends Fragment {
 
         bindUser();
         binding.tvServerValue.setText(Api.baseUrl());
-        bindReader();
-
-        binding.rowReader.setOnClickListener(v ->
-                new ReaderSettingsSheet((MainActivity) requireActivity(), this::bindReader).show());
         binding.btnLogout.setOnClickListener(v -> confirmLogout());
 
         if (!animated) {
             animated = true;
             animateEntry();
         }
-    }
-
-    /** Which reader is selected, and whether it could actually work right now. */
-    private void bindReader() {
-        if (binding == null) return;
-        binding.ivReader.setImageResource(CardReaders.tapIcon());
-        binding.tvReaderValue.setText(CardReaders.describe(requireContext()));
-        String reason = CardReaders.create(requireActivity()).unavailableReason();
-        binding.tvReaderStatus.setText(reason == null ? getString(R.string.nfc_ready) : reason);
     }
 
     private void bindUser() {
@@ -110,7 +96,7 @@ public class ProfileFragment extends Fragment {
     /** Same stagger as the login screen: fade in and rise 16dp, 60ms apart. */
     private void animateEntry() {
         View[] views = {
-                binding.cardAvatar, binding.rowServer, binding.rowReader, binding.rowRole, binding.btnLogout,
+                binding.cardAvatar, binding.rowServer, binding.rowRole, binding.btnLogout,
         };
         int dy = Ui.dp(requireContext(), 16);
         for (int i = 0; i < views.length; i++) {

@@ -18,7 +18,6 @@ import com.legitcoconut.thanimaticketing.databinding.FragmentEventDetailBinding;
 import com.legitcoconut.thanimaticketing.databinding.ItemActionBinding;
 import com.legitcoconut.thanimaticketing.databinding.ItemStatChipBinding;
 import com.legitcoconut.thanimaticketing.model.Event;
-import com.legitcoconut.thanimaticketing.card.CardReaders;
 import com.legitcoconut.thanimaticketing.net.Api;
 import com.legitcoconut.thanimaticketing.util.Nav;
 import com.legitcoconut.thanimaticketing.util.Ui;
@@ -162,7 +161,7 @@ public class EventDetailFragment extends Fragment {
 
     private void buildChips(Api.EventDetails d, Event event) {
         int[] labels = {R.string.stat_food, R.string.in_pool, R.string.unpaid};
-        int[] values = {d.foodScanCount, d.userPoolCount, d.unpaidCount};
+        int[] values = {d.foodAssignedCount, d.userPoolCount, d.unpaidCount};
         boolean[] shown = {event.foodSessionsEnabled, event.userPoolEnabled, event.unpaidEnabled};
 
         StringBuilder sig = new StringBuilder();
@@ -234,10 +233,8 @@ public class EventDetailFragment extends Fragment {
         }
 
         if (event.userPoolEnabled) {
-            // A phone with no NFC can still work the pool if a Bluetooth reader is set up.
-            boolean nfcOk = CardReaders.anyConfigured(requireContext());
             addAction(inflater, container, R.drawable.ic_tile_pool, getString(R.string.user_pool),
-                    nfcOk ? getString(R.string.user_pool_sub) : getString(R.string.nfc_unavailable_tile), nfcOk,
+                    getString(R.string.user_pool_sub), true,
                     () -> Nav.push(requireActivity(), PoolFragment.newInstance(eventId, eventTitle)));
 
             addAction(inflater, container, R.drawable.ic_tile_history, getString(R.string.pool_history),

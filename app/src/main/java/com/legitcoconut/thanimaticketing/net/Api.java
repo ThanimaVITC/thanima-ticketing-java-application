@@ -42,8 +42,9 @@ import java.util.concurrent.Executors;
  * Two conventions, straight from the API docs:
  *   1. Most methods deliver a parsed model, or an error string on any non 200.
  *   2. The outcome carrying ones deliver a {@link Res} for every status code, because
- *      their 4xx bodies mean something the UI renders differently. Those are
- *      scanFoodSession, the three user pool calls and addUnpaid.
+ *      their 4xx bodies mean something the UI renders differently. Those are the two
+ *      attendance calls, assignFoodSlot, scanFoodSession, the three user pool calls
+ *      and addUnpaid.
  */
 public final class Api {
 
@@ -313,8 +314,8 @@ public final class Api {
         public final int totalRegistrations;
         public final int totalAttendance;
         public final int attendanceRate;
-        public final int foodScanCount;
-        public final int foodScanRate;
+        public final int foodAssignedCount;
+        public final int foodAssignedRate;
         public final int userPoolCount;
         public final int unpaidCount;
 
@@ -327,8 +328,8 @@ public final class Api {
             totalRegistrations = s.optInt("totalRegistrations", registrations.size());
             totalAttendance = s.optInt("totalAttendance", 0);
             attendanceRate = s.optInt("attendanceRate", 0);
-            foodScanCount = s.optInt("foodScanCount", 0);
-            foodScanRate = s.optInt("foodScanRate", 0);
+            foodAssignedCount = s.optInt("foodAssignedCount", 0);
+            foodAssignedRate = s.optInt("foodAssignedRate", 0);
             userPoolCount = s.optInt("userPoolCount", 0);
             unpaidCount = s.optInt("unpaidCount", 0);
         }
@@ -345,24 +346,26 @@ public final class Api {
     // ------------------------------------------------------------------ attendance
 
     /** Manual name tap marking. The server only authenticates this route for source web. */
-    public static void markAttendance(String eventId, String email, Cb<JSONObject> cb) {
+    /**
+     * Outcome carrying. Both marking calls ride back a "food" block carrying the live
+     * session list and whatever colour this attendee already holds, and it is present on
+     * the 409 already marked reply too — so someone marked before the sessions went live
+     * still gets the colour picker on a re-scan.
+     */
+    public static void markAttendance(String eventId, String email, Cb<Res> cb) {
         run(() -> {
             JSONObject body = new JSONObject()
                     .put("eventId", eventId).put("email", email).put("source", "mobile");
-            Res r = raw("POST", "/attendance/mark", body);
-            if (r.code == 409) throw new Failure(r.error("Attendance already marked"));
-            expect(r, "Failed to mark attendance");
-            return r.obj("attendance");
+            return raw("POST", "/attendance/mark", body);
         }, cb);
     }
 
-    /** QR marking. Resolves the ticket and marks in one step. */
-    public static void verifyQrAttendance(String encryptedData, String eventId, Cb<JSONObject> cb) {
+    /** QR marking. Resolves the ticket and marks in one step. Outcome carrying, as above. */
+    public static void verifyQrAttendance(String encryptedData, String eventId, Cb<Res> cb) {
         run(() -> {
             JSONObject body = new JSONObject()
                     .put("encryptedData", encryptedData).put("eventId", eventId);
-            Res r = expect(raw("POST", "/attendance/verify-qr", body), "Failed to mark attendance");
-            return r.obj("attendance");
+            return raw("POST", "/attendance/verify-qr", body);
         }, cb);
     }
 
@@ -410,14 +413,30 @@ public final class Api {
         run(() -> {
             Res r = expect(raw("GET", "/events/" + eventId + "/food-sessions?activeOnly=1", null),
                     "Failed to load food sessions");
-            JSONArray a = r.data.optJSONArray("sessions");
-            List<FoodSession> out = new ArrayList<>();
-            if (a != null) for (int i = 0; i < a.length(); i++) out.add(new FoodSession(a.getJSONObject(i)));
-            return cache("food:" + eventId, out);
+            return cache("food:" + eventId, foodSessions(r.data.optJSONArray("sessions")));
         }, cb);
     }
 
-    /** Outcome carrying. 409 alreadyScanned and 409 full are normal answers, not errors. */
+    /** Reads a sessions array from either the list endpoint or an attendance food block. */
+    public static List<FoodSession> foodSessions(JSONArray a) throws JSONException {
+        List<FoodSession> out = new ArrayList<>();
+        if (a != null) for (int i = 0; i < a.length(); i++) out.add(new FoodSession(a.getJSONObject(i)));
+        return out;
+    }
+
+    /**
+     * Hands an attendee a colour. Outcome carrying: 409 full and 409 alreadyAssigned are
+     * normal answers the picker redraws from, not errors.
+     *
+     * There is deliberately no call for moving someone between colours. That is a dashboard
+     * job, and leaving it out of this class is what keeps it one.
+     */
+    public static void assignFoodSlot(String eventId, String email, String sessionId, Cb<Res> cb) {
+        run(() -> raw("POST", "/events/" + eventId + "/food-assignments",
+                new JSONObject().put("email", email).put("foodSessionId", sessionId)), cb);
+    }
+
+    /** Outcome carrying. 409 wrongSession, noAssignment and alreadyServed are normal answers. */
     public static void scanFoodSession(String eventId, String sessionId, String encryptedData,
                                        Cb<Res> cb) {
         run(() -> raw("POST", "/events/" + eventId + "/food-sessions/" + sessionId + "/scan",
@@ -452,19 +471,19 @@ public final class Api {
         }, cb);
     }
 
-    /** Outcome carrying. 409 alreadyInPool and 409 cardInUse are answers the screen renders. */
-    public static void addToUserPool(String eventId, String encryptedData, String nfcId, Cb<Res> cb) {
+    /** Outcome carrying. 409 alreadyInPool is an answer the screen renders, not an error. */
+    public static void addToUserPool(String eventId, String encryptedData, Cb<Res> cb) {
         run(() -> raw("POST", "/events/" + eventId + "/user-pool/add",
-                new JSONObject().put("encryptedData", encryptedData).put("nfcId", nfcId)), cb);
+                new JSONObject().put("encryptedData", encryptedData)), cb);
     }
 
-    /** Outcome carrying. A 404 with found false means the card is simply not in the pool. */
-    public static void lookupPoolByNfc(String eventId, String nfcId, Cb<Res> cb) {
-        run(() -> raw("GET", "/events/" + eventId + "/user-pool/lookup?nfcId=" + Uri.encode(nfcId),
-                null), cb);
+    /** Outcome carrying. A 404 with found false means that person is simply not in the pool. */
+    public static void lookupPoolByTicket(String eventId, String encryptedData, Cb<Res> cb) {
+        run(() -> raw("GET", "/events/" + eventId + "/user-pool/lookup?encryptedData="
+                + Uri.encode(encryptedData), null), cb);
     }
 
-    /** Outcome carrying. 409 alreadyRemoved means someone else already returned the card. */
+    /** Outcome carrying. 409 alreadyRemoved means someone else already signed them out. */
     public static void removeFromUserPool(String eventId, String entryId, Cb<Res> cb) {
         run(() -> raw("POST", "/events/" + eventId + "/user-pool/remove",
                 new JSONObject().put("entryId", entryId)), cb);

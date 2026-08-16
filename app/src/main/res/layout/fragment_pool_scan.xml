@@ -195,128 +195,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnContinue"
+                    android:id="@+id/btnConfirm"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="20dp"
-                    android:text="@string/continue_label" />
+                    android:text="@string/pool_add_action" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnScanDifferent"
+                    android:id="@+id/btnCancelScan"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/scan_different_ticket" />
+                    android:text="@string/cancel" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
-        <!-- TAP_CARD -->
-        <LinearLayout
-            android:id="@+id/groupTap"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <FrameLayout
-                android:id="@+id/nfcPulseGroup"
-                android:layout_width="160dp"
-                android:layout_height="160dp">
-
-                <View
-                    android:id="@+id/ring1"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:alpha="0"
-                    android:background="@drawable/pool_circle_primary" />
-
-                <View
-                    android:id="@+id/ring2"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:alpha="0"
-                    android:background="@drawable/pool_circle_primary" />
-
-                <View
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/pool_circle_container" />
-
-                <ImageView
-                    android:id="@+id/ivNfc"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_nfc"
-                    app:tint="?attr/colorPrimary" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/tvTapTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:gravity="center"
-                android:paddingHorizontal="40dp"
-                android:text="@string/tap_card"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
-
-            <TextView
-                android:id="@+id/tvTapStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:paddingHorizontal="40dp"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:visibility="gone"
-                tools:text="Connected to ESP-Reader"
-                tools:visibility="visible" />
-
-            <LinearLayout
-                android:id="@+id/groupNfcUnavailable"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="?attr/colorSurface"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="32dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_error"
-                    app:tint="?attr/colorError" />
-
-                <TextView
-                    android:id="@+id/tvNfcUnavailable"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTapBack"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/back" />
-            </LinearLayout>
-        </LinearLayout>
 
         <!-- SUBMITTING -->
         <LinearLayout
@@ -405,13 +298,13 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddAnother"
+                    android:id="@+id/btnScanAnother"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
-                    android:text="@string/add_another" />
+                    android:text="@string/pool_add_another" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDone"

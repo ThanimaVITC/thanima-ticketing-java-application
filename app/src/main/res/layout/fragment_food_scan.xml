@@ -46,51 +46,6 @@
             android:text="@string/grant_permission" />
     </LinearLayout>
 
-    <!-- Full screen panel once the session hits its hard cap: scanning stops for good. -->
-    <LinearLayout
-        android:id="@+id/fullPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/colorSurface"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="32dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:contentDescription="@null"
-            android:src="@drawable/ic_error"
-            app:tint="?attr/colorError" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="@string/session_full"
-            android:textAppearance="?attr/textAppearanceTitleLarge"
-            android:textColor="?attr/colorOnSurface" />
-
-        <TextView
-            android:id="@+id/fullPanelCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="50 admitted" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/fullPanelClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/close" />
-    </LinearLayout>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="170dp"
@@ -140,7 +95,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/statSeatsLeftValue"
+                        android:id="@+id/statServedValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/food_stat_placeholder"
@@ -152,7 +107,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_marginBottom="4dp"
-                        android:text="@string/food_seats_left"
+                        android:text="@string/food_served_label"
                         android:textAppearance="?attr/textAppearanceLabelMedium"
                         android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
@@ -164,7 +119,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/statAdmittedValue"
+                        android:id="@+id/statAssignedValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/food_stat_placeholder"
@@ -176,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
                         android:layout_marginBottom="2dp"
-                        android:text="@string/admitted"
+                        android:text="@string/food_assigned_label"
                         android:textAppearance="?attr/textAppearanceLabelSmall"
                         android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>

@@ -1,7 +1,5 @@
 package com.legitcoconut.thanimaticketing.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,26 +15,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.legitcoconut.thanimaticketing.R;
 import com.legitcoconut.thanimaticketing.databinding.FragmentPoolBinding;
 import com.legitcoconut.thanimaticketing.databinding.ItemPoolEntryBinding;
-import com.legitcoconut.thanimaticketing.databinding.SheetPoolRemoveBinding;
 import com.legitcoconut.thanimaticketing.model.PoolEntry;
-import com.legitcoconut.thanimaticketing.card.CardReader;
-import com.legitcoconut.thanimaticketing.card.CardReaders;
 import com.legitcoconut.thanimaticketing.net.Api;
 import com.legitcoconut.thanimaticketing.util.Nav;
 import com.legitcoconut.thanimaticketing.util.Ui;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Who is holding a card right now. Stats, a live-ticking list of active stays, and the
- * two actions (Add / Remove) that move cards in and out of the pool.
+ * Who is in the pool right now. Stats, a live-ticking list of active stays, and the two
+ * actions that open and close them. Both actions are the same ticket scanner in a
+ * different mode.
  */
 public class PoolFragment extends Fragment {
 
@@ -55,7 +48,6 @@ public class PoolFragment extends Fragment {
     private FragmentPoolBinding binding;
     private String eventId;
     private String eventTitle;
-    private CardReader nfcReader;
     private final PoolEntryAdapter adapter = new PoolEntryAdapter();
 
     private final Handler tickHandler = new Handler(Looper.getMainLooper());
@@ -88,23 +80,16 @@ public class PoolFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        nfcReader = CardReaders.create(requireActivity());
 
         Ui.toolbar(this, binding.toolbar, getString(R.string.user_pool));
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(adapter);
 
-        String reason = nfcReader.unavailableReason();
-        boolean nfcOk = reason == null;
-        binding.cardNfcWarning.setVisibility(nfcOk ? View.GONE : View.VISIBLE);
-        if (!nfcOk) binding.tvNfcReason.setText(reason);
-        binding.fabAdd.setEnabled(nfcOk);
-        binding.btnRemove.setEnabled(nfcOk);
-
-        binding.fabAdd.setOnClickListener(v ->
-                Nav.push(requireActivity(), PoolAddFragment.newInstance(eventId, eventTitle)));
-        binding.btnRemove.setOnClickListener(v -> showRemoveSheet());
+        binding.fabAdd.setOnClickListener(v -> Nav.push(requireActivity(),
+                PoolScanFragment.newInstance(eventId, eventTitle, PoolScanFragment.Mode.ADD)));
+        binding.btnRemove.setOnClickListener(v -> Nav.push(requireActivity(),
+                PoolScanFragment.newInstance(eventId, eventTitle, PoolScanFragment.Mode.REMOVE)));
         binding.swipeRefresh.setOnRefreshListener(this::load);
 
         Api.PoolResult cached = Api.peek("pool:" + eventId + ":active");
@@ -124,14 +109,12 @@ public class PoolFragment extends Fragment {
     public void onPause() {
         super.onPause();
         tickHandler.removeCallbacks(ticker);
-        if (nfcReader != null) nfcReader.stop();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         tickHandler.removeCallbacks(ticker);
-        if (nfcReader != null) nfcReader.stop();
         binding = null;
     }
 
@@ -155,154 +138,6 @@ public class PoolFragment extends Fragment {
         adapter.submit(result.entries);
         Ui.animateList(binding.recyclerView);
         binding.emptyState.setVisibility(result.entries.isEmpty() ? View.VISIBLE : View.GONE);
-    }
-
-    // ------------------------------------------------------------------ remove bottom sheet
-
-    private void showRemoveSheet() {
-        if (nfcReader == null) return;
-        SheetPoolRemoveBinding sb = SheetPoolRemoveBinding.inflate(LayoutInflater.from(requireContext()));
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        dialog.setContentView(sb.getRoot());
-
-        RemoveSession session = new RemoveSession(sb, dialog);
-        dialog.setOnDismissListener(d -> {
-            nfcReader.stop();
-            session.stopPulse();
-        });
-        session.showScanning();
-        dialog.show();
-    }
-
-    /** One run through the four remove stages. A fresh instance per sheet, so state never leaks. */
-    private final class RemoveSession {
-        private final SheetPoolRemoveBinding sb;
-        private final BottomSheetDialog dialog;
-        private final List<Animator> pulseAnimators = new ArrayList<>();
-        private String entryId;
-        private String entryName;
-
-        RemoveSession(SheetPoolRemoveBinding sb, BottomSheetDialog dialog) {
-            this.sb = sb;
-            this.dialog = dialog;
-            sb.btnScanningCancel.setOnClickListener(v -> dialog.dismiss());
-            sb.btnConfirmCancel.setOnClickListener(v -> dialog.dismiss());
-            sb.btnConfirmRemove.setOnClickListener(v -> remove());
-            sb.btnRetry.setOnClickListener(v -> showScanning());
-        }
-
-        void showScanning() {
-            stage(sb.stageScanning);
-
-            sb.tvScanTitle.setText(CardReaders.tapPrompt());
-            sb.ivNfc.setImageResource(CardReaders.tapIcon());
-            sb.tvScanStatus.setVisibility(CardReaders.usingBluetooth() ? View.VISIBLE : View.GONE);
-            nfcReader.setOnState((status, ready) -> {
-                if (binding == null || !dialog.isShowing()) return;
-                sb.tvScanStatus.setText(status);
-            });
-
-            startPulse();
-            nfcReader.stop();
-            nfcReader.start(this::lookup);
-        }
-
-        private void lookup(String uid) {
-            Api.lookupPoolByNfc(eventId, uid, (res, err) -> {
-                if (binding == null || !dialog.isShowing()) return;
-                if (res == null) {
-                    showFailed(err != null ? err : getString(R.string.pool_not_found));
-                    return;
-                }
-                if (res.code == 200 && res.flag("found")) {
-                    showConfirming(res.obj("entry"));
-                } else {
-                    showFailed(res.error(getString(R.string.pool_not_found)));
-                }
-            });
-        }
-
-        private void showConfirming(JSONObject entry) {
-            nfcReader.stop();
-            stopPulse();
-            entryId = entry.optString("_id", "");
-            entryName = entry.optString("name", "");
-            sb.tvConfirmName.setText(entryName);
-            sb.tvConfirmRegNo.setText(entry.optString("regNo", ""));
-            sb.tvConfirmEntered.setText(getString(R.string.pool_entered_label,
-                    Ui.formatDateTime(entry.isNull("enteredAt") ? null : entry.optString("enteredAt", null))));
-            sb.tvConfirmHeld.setText(getString(R.string.pool_held_label,
-                    Ui.formatDuration(entry.optLong("durationMs", 0L))));
-            stage(sb.stageConfirming);
-        }
-
-        private void remove() {
-            stage(sb.stageRemoving);
-            Api.removeFromUserPool(eventId, entryId, (res, err) -> {
-                if (binding == null || !dialog.isShowing()) return;
-                if (res == null) {
-                    showFailed(err != null ? err : getString(R.string.pool_remove_failed));
-                    return;
-                }
-                if (res.ok() && res.flag("ok")) {
-                    Ui.feedback(requireContext(), true);
-                    dialog.dismiss();
-                    Ui.snack(binding.getRoot(), getString(R.string.pool_returned, entryName,
-                            Ui.formatDuration(res.data.optLong("durationMs", 0L))));
-                    load();
-                } else if (res.code == 409 && res.flag("alreadyRemoved")) {
-                    showFailed(res.error(getString(R.string.pool_already_removed)));
-                    load();
-                } else {
-                    showFailed(res.error(getString(R.string.pool_remove_failed)));
-                }
-            });
-        }
-
-        private void showFailed(String message) {
-            nfcReader.stop();
-            stopPulse();
-            sb.tvFailedMessage.setText(message);
-            stage(sb.stageFailed);
-        }
-
-        private void stage(View visible) {
-            TransitionManager.beginDelayedTransition(sb.getRoot(), new Fade());
-            View[] all = {sb.stageScanning, sb.stageConfirming, sb.stageRemoving, sb.stageFailed};
-            for (View v : all) v.setVisibility(v == visible ? View.VISIBLE : View.GONE);
-        }
-
-        private void startPulse() {
-            stopPulse();
-            Animator r1 = AnimatorInflater.loadAnimator(requireContext(), R.animator.pool_ring_pulse);
-            r1.setTarget(sb.ring1);
-            r1.start();
-            pulseAnimators.add(r1);
-
-            Animator r2 = AnimatorInflater.loadAnimator(requireContext(), R.animator.pool_ring_pulse);
-            r2.setTarget(sb.ring2);
-            r2.setStartDelay(800);
-            r2.start();
-            pulseAnimators.add(r2);
-
-            Animator icon = AnimatorInflater.loadAnimator(requireContext(), R.animator.pulse);
-            icon.setTarget(sb.ivNfc);
-            icon.start();
-            pulseAnimators.add(icon);
-        }
-
-        void stopPulse() {
-            for (Animator a : pulseAnimators) a.cancel();
-            pulseAnimators.clear();
-            sb.ring1.setAlpha(0f);
-            sb.ring2.setAlpha(0f);
-            sb.ring1.setScaleX(1f);
-            sb.ring1.setScaleY(1f);
-            sb.ring2.setScaleX(1f);
-            sb.ring2.setScaleY(1f);
-            sb.ivNfc.setScaleX(1f);
-            sb.ivNfc.setScaleY(1f);
-        }
     }
 
     // ------------------------------------------------------------------ list adapter
@@ -360,7 +195,6 @@ public class PoolFragment extends Fragment {
                 entry = e;
                 binding.tvName.setText(e.name);
                 binding.tvRegNo.setText(e.regNo);
-                binding.tvUid.setText(e.nfcId);
                 binding.tvTimer.setText(e.timeInPool());
             }
         }

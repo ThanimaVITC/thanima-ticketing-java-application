@@ -29,12 +29,12 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- The art carries its own colour, so no tint and no container behind it. -->
-            <ImageView
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@drawable/ic_tile_session"
-                android:contentDescription="@null" />
+            <!-- The session's own colour, painted at bind time. It is the session's identity,
+                 so it stands in for the icon entirely. -->
+            <View
+                android:id="@+id/colorDot"
+                android:layout_width="36dp"
+                android:layout_height="36dp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -51,7 +51,7 @@
                     android:textColor="?attr/colorOnSurface"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    tools:text="Lunch, Day One" />
+                    tools:text="Red" />
 
                 <TextView
                     android:id="@+id/tvCapacity"
