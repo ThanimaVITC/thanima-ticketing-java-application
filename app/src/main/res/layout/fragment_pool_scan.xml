@@ -127,87 +127,52 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    style="?attr/materialCardViewElevatedStyle"
-                    android:layout_width="match_parent"
+                <include
+                    android:id="@+id/idCard"
+                    layout="@layout/view_id_card" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp">
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:id="@+id/ivConfirmAttended"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/tvConfirmAttended"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="24dp">
+                        android:layout_marginStart="8dp"
+                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+                </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tvConfirmName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceTitleLarge"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <TextView
-                            android:id="@+id/tvConfirmRegNo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
-
-                        <TextView
-                            android:id="@+id/tvConfirmEmail"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <TextView
-                            android:id="@+id/tvConfirmPhone"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:id="@+id/ivConfirmAttended"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:contentDescription="@null" />
-
-                            <TextView
-                                android:id="@+id/tvConfirmAttended"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:textAppearance="?attr/textAppearanceBodyMedium" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
+                <!-- Tinted in code: green to add, red to remove. Dynamic colour would
+                     otherwise paint both the same wallpaper hue. -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirm"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="20dp"
-                    android:text="@string/pool_add_action" />
+                    android:text="@string/pool_add_action"
+                    android:textColor="@color/action_on_confirm"
+                    app:iconTint="@color/action_on_confirm" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelScan"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/cancel" />
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/cancel"
+                    android:textColor="?attr/colorOnSurface"
+                    app:strokeColor="?attr/colorOutline" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

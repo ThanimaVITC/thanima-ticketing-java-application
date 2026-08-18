@@ -5,6 +5,8 @@
          camera_permission_needed, grant_permission, marked_present, already_marked,
          ticket_valid, scan_next, scan_again). -->
     <string name="scan_verification_failed">Verification failed</string>
+    <string name="scan_cancelled">Cancelled</string>
+    <string name="scan_cancelled_detail">No food slot picked, so nobody was marked present.</string>
     <string name="scan_not_marked">Not marked yet</string>
     <string name="scan_phone">Phone</string>
     <string name="scan_event">Event</string>

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.snackbar.Snackbar;
 import com.legitcoconut.thanimaticketing.R;
+import com.legitcoconut.thanimaticketing.databinding.ViewIdCardBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -179,6 +180,15 @@ public final class Ui {
      */
     public static void resetListAnimation(RecyclerView list) {
         list.setTag(R.id.tag_list_animated, null);
+    }
+
+    /** Fills the shared ID card layout. Phone is optional, so its line drops out when empty. */
+    public static void fillIdCard(ViewIdCardBinding card, String name, String regNo,
+                                 @Nullable String phone) {
+        card.tvIdName.setText(name);
+        card.tvIdRegNo.setText(regNo);
+        card.tvIdPhone.setVisibility(phone == null || phone.isEmpty() ? View.GONE : View.VISIBLE);
+        card.tvIdPhone.setText(phone);
     }
 
     /** Springy pop for a result card appearing. */

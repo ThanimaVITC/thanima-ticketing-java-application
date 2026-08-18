@@ -206,7 +206,7 @@ public class EventDetailFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         actionIndex = 0;
 
-        addAction(inflater, container, R.drawable.ic_tile_scan, getString(R.string.scan_qr),
+        addAction(inflater, container, R.drawable.ic_tile_scan, getString(R.string.qr_attendance),
                 getString(R.string.scan_qr_sub), true,
                 () -> Nav.push(requireActivity(), ScanFragment.newInstance(eventId, eventTitle)));
 

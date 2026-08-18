@@ -148,9 +148,48 @@ public class ManualAttendanceFragment extends Fragment {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.mark_present)
                 .setMessage(getString(R.string.att_mark_present_message, r.name, r.regNo))
-                .setPositiveButton(R.string.mark_present, (d, w) -> mark(r))
+                .setPositiveButton(R.string.mark_present, (d, w) -> beginMark(r))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    /**
+     * On a food event the colour comes first: the mark only happens once a slot is picked, so
+     * backing out of the picker leaves them unmarked and still on the list. Anything that
+     * stops the picker from opening falls back to marking outright.
+     */
+    private void beginMark(Registration r) {
+        Api.getFoodSessions(eventId, (sessions, error) -> {
+            if (binding == null) return;
+            if (error != null || sessions.isEmpty()) {
+                mark(r);
+                return;
+            }
+            boolean shown = FoodSlotSheet.showBeforeMark(getParentFragmentManager(), eventId,
+                    sessions, r.name, r.regNo, r.email, r.phone,
+                    done -> Api.markAttendance(eventId, r.email, (res, markError) -> {
+                        if (binding != null && res != null && res.ok()) onMarked(r, res);
+                        done.done(res, markError);
+                    }),
+                    (colorName, colorInt) -> {
+                        if (binding == null) return;
+                        Ui.snack(binding.getRoot(),
+                                getString(R.string.food_slot_assigned_format, colorName));
+                    },
+                    marked -> {
+                    });
+            if (!shown) mark(r);
+        });
+    }
+
+    /** The bookkeeping a successful mark leaves behind, whichever path got there. */
+    private void onMarked(Registration r, Res res) {
+        r.attended = true;
+        r.markedAt = res.obj("attendance").optString("markedAt", null);
+        Ui.feedback(requireContext(), true);
+        Ui.snack(binding.getRoot(), getString(R.string.att_marked_present_fmt, r.name));
+        updateSummary();
+        removeRow(visible.indexOf(r));
     }
 
     private void mark(Registration r) {
@@ -186,12 +225,7 @@ public class ManualAttendanceFragment extends Fragment {
                 return;
             }
 
-            r.attended = true;
-            r.markedAt = res.obj("attendance").optString("markedAt", null);
-            Ui.feedback(requireContext(), true);
-            Ui.snack(binding.getRoot(), getString(R.string.att_marked_present_fmt, r.name));
-            updateSummary();
-            removeRow(idx);
+            onMarked(r, res);
             offerFoodSlot(res, r);
         });
     }
@@ -199,7 +233,7 @@ public class ManualAttendanceFragment extends Fragment {
     /** The door assigns a colour whichever way someone is marked present, tap or scan. */
     private void offerFoodSlot(Res res, Registration r) {
         FoodSlotSheet.showIfNeeded(getParentFragmentManager(), eventId,
-                res.data.optJSONObject("food"), r.name, r.regNo, r.email,
+                res.data.optJSONObject("food"), r.name, r.regNo, r.email, r.phone,
                 (colorName, colorInt) -> {
                     if (binding == null) return;
                     Ui.snack(binding.getRoot(), getString(R.string.food_slot_assigned_format, colorName));

@@ -16,15 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.color.MaterialColors;
 import com.legitcoconut.thanimaticketing.R;
 import com.legitcoconut.thanimaticketing.databinding.SheetFoodSlotBinding;
 import com.legitcoconut.thanimaticketing.model.FoodSession;
 import com.legitcoconut.thanimaticketing.net.Api;
+import com.legitcoconut.thanimaticketing.net.Cb;
 import com.legitcoconut.thanimaticketing.net.Res;
 import com.legitcoconut.thanimaticketing.util.Ui;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,9 +41,15 @@ import java.util.List;
  * Opened from both marking paths, the QR scanner and the manual list, because an attendee
  * marked either way needs a colour just the same.
  *
- * Not dismissible: picking is mandatory. The one exception is after a failed call, where a
- * close button appears so a dead network cannot wedge the queue — the dashboard can assign
- * those stragglers afterwards.
+ * Two ways in. {@link #showBeforeMark} is the one a fresh scan or tap takes: nothing has
+ * reached the server yet, so backing out marks nobody, and the colour and the mark are spent
+ * together on the tap. {@link #showIfNeeded} is the after-the-fact one, for somebody already
+ * marked present who still owes a colour — there the mark cannot be taken back, so the sheet
+ * refuses to close until a colour lands.
+ *
+ * Either way, once a mark is on the server the only escape is a failed call, where a close
+ * button appears so a dead network cannot wedge the queue — the dashboard can assign those
+ * stragglers afterwards.
  */
 public class FoodSlotSheet extends BottomSheetDialogFragment {
 
@@ -49,7 +58,7 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     private static final String ARG_EMAIL = "email";
     private static final String ARG_NAME = "name";
     private static final String ARG_REG_NO = "regNo";
-    private static final String ARG_SESSIONS = "sessions";
+    private static final String ARG_PHONE = "phone";
 
     /** Told the colour that was assigned, so the caller can show it on its result card. */
     public interface OnAssigned {
@@ -57,27 +66,65 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     }
 
     /**
+     * Marks attendance, run once a colour has been chosen. The caller owns the call so it can
+     * render its own result; the sheet only needs the outcome to know whether to go on.
+     */
+    public interface Mark {
+        void run(Cb<Res> done);
+    }
+
+    /** Told whether anybody ended up marked, so a cancelled scan can say so and move on. */
+    public interface OnClosed {
+        void closed(boolean marked);
+    }
+
+    /**
+     * Picker for somebody not yet marked present: no colour, no mark. Returns false when
+     * there is nothing to ask, and the caller should then mark them the plain way.
+     */
+    public static boolean showBeforeMark(FragmentManager fm, String eventId,
+                                         List<FoodSession> sessions, String name, String regNo,
+                                         String email, String phone, Mark mark,
+                                         OnAssigned onAssigned, OnClosed onClosed) {
+        if (sessions == null || sessions.isEmpty()) return false;
+        if (email == null || email.isEmpty()) return false;
+        return show(fm, eventId, sessions, name, regNo, email, phone, mark, onAssigned, onClosed);
+    }
+
+    /**
      * Reads the food block an attendance response carries and shows the picker when the
      * attendee still needs a colour. Returns false when there is nothing to ask.
      */
     public static boolean showIfNeeded(FragmentManager fm, String eventId, JSONObject food,
-                                       String name, String regNo, String email,
-                                       OnAssigned onAssigned, Runnable onClosed) {
+                                       String name, String regNo, String email, String phone,
+                                       OnAssigned onAssigned, OnClosed onClosed) {
         if (food == null || !food.optBoolean("enabled", false)) return false;
         if (!food.isNull("assignment")) return false;
         if (email == null || email.isEmpty()) return false;
 
-        JSONArray sessions = food.optJSONArray("sessions");
-        if (sessions == null || sessions.length() == 0) return false;
+        List<FoodSession> sessions;
+        try {
+            sessions = Api.foodSessions(food.optJSONArray("sessions"));
+        } catch (JSONException e) {
+            return false;
+        }
+        if (sessions.isEmpty()) return false;
+        return show(fm, eventId, sessions, name, regNo, email, phone, null, onAssigned, onClosed);
+    }
 
+    private static boolean show(FragmentManager fm, String eventId, List<FoodSession> sessions,
+                                String name, String regNo, String email, @Nullable String phone,
+                                @Nullable Mark mark, OnAssigned onAssigned, OnClosed onClosed) {
         FoodSlotSheet sheet = new FoodSlotSheet();
         Bundle args = new Bundle();
         args.putString(ARG_EVENT_ID, eventId);
         args.putString(ARG_EMAIL, email);
         args.putString(ARG_NAME, name);
         args.putString(ARG_REG_NO, regNo);
-        args.putString(ARG_SESSIONS, sessions.toString());
+        args.putString(ARG_PHONE, phone);
         sheet.setArguments(args);
+        sheet.sessions.addAll(sessions);
+        sheet.mark = mark;
         sheet.onAssigned = onAssigned;
         sheet.onClosed = onClosed;
         sheet.show(fm, TAG);
@@ -85,29 +132,28 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     }
 
     private SheetFoodSlotBinding binding;
+    @Nullable
+    private Mark mark;
     private OnAssigned onAssigned;
-    private Runnable onClosed;
+    private OnClosed onClosed;
     private String eventId;
     private String email;
     private final List<FoodSession> sessions = new ArrayList<>();
     private boolean assigning;
+    /** Chosen but not yet spent. Nothing leaves this screen until the button is pressed. */
+    @Nullable
+    private FoodSession selected;
+    /** True once the mark is on the server, which is the point there is no going back from. */
+    private boolean marked;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setCancelable(false);
+        // Escapable only while nobody is marked yet.
+        setCancelable(mark != null);
         Bundle args = requireArguments();
         eventId = args.getString(ARG_EVENT_ID);
         email = args.getString(ARG_EMAIL);
-        parseSessions(args.getString(ARG_SESSIONS));
-    }
-
-    private void parseSessions(String raw) {
-        sessions.clear();
-        try {
-            sessions.addAll(Api.foodSessions(new JSONArray(raw == null ? "[]" : raw)));
-        } catch (JSONException ignored) {
-        }
     }
 
     @NonNull
@@ -115,6 +161,15 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.setCanceledOnTouchOutside(false);
+        // A card plus circles plus a button never fits the collapsed peek, so skip it.
+        dialog.setOnShowListener(d -> {
+            View sheet = ((BottomSheetDialog) d)
+                    .findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (sheet == null) return;
+            BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(sheet);
+            behavior.setSkipCollapsed(true);
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        });
         return dialog;
     }
 
@@ -130,10 +185,15 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String name = requireArguments().getString(ARG_NAME, "");
-        String regNo = requireArguments().getString(ARG_REG_NO, "");
-        binding.attendee.setText(regNo.isEmpty() ? name : getString(R.string.food_attendee_format, name, regNo));
+        Bundle args = requireArguments();
+        Ui.fillIdCard(binding.idCard, args.getString(ARG_NAME, ""),
+                args.getString(ARG_REG_NO, ""), args.getString(ARG_PHONE));
 
+        binding.confirmButton.setText(mark != null
+                ? R.string.food_mark_attendance : R.string.food_assign_slot);
+        binding.confirmButton.setOnClickListener(v -> {
+            if (selected != null) assign(selected);
+        });
         binding.closeButton.setOnClickListener(v -> dismiss());
         renderSlots();
     }
@@ -142,8 +202,8 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
     public void onDismiss(@NonNull android.content.DialogInterface dialog) {
         super.onDismiss(dialog);
         // The caller holds its scanner paused while this is up, so it needs telling either
-        // way — assigned or closed after a failure.
-        if (onClosed != null) onClosed.run();
+        // way — assigned, closed after a failure, or backed out before anything was marked.
+        if (onClosed != null) onClosed.closed(mark == null || marked);
     }
 
     @Override
@@ -204,9 +264,24 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
             column.setAlpha(0.3f);
             column.setEnabled(false);
             label.setText(getString(R.string.food_slot_full_format, session.colorName));
-        } else {
-            column.setOnClickListener(v -> assign(session));
+            return column;
         }
+
+        // Chosen, not spent: the button is what commits it.
+        boolean chosen = selected != null && selected.id.equals(session.id);
+        if (chosen) {
+            circle.setStroke(Ui.dp(requireContext(), 4),
+                    MaterialColors.getColor(column, com.google.android.material.R.attr.colorPrimary));
+            label.setTypeface(label.getTypeface(), android.graphics.Typeface.BOLD);
+        } else {
+            column.setAlpha(selected == null ? 1f : 0.45f);
+        }
+        column.setOnClickListener(v -> {
+            if (assigning) return;
+            selected = session;
+            renderSlots();
+            binding.confirmButton.setEnabled(true);
+        });
         return column;
     }
 
@@ -224,12 +299,47 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
         if (assigning || binding == null) return;
         assigning = true;
         binding.errorText.setVisibility(View.GONE);
+        binding.confirmButton.setEnabled(false);
         binding.slotGrid.setAlpha(0.5f);
 
+        if (mark != null && !marked) {
+            markThenAssign(session);
+            return;
+        }
+        assignSlot(session);
+    }
+
+    /**
+     * Picking the colour is what commits the mark, so the two go together. A mark that fails
+     * leaves nobody marked and the sheet open to try again.
+     */
+    private void markThenAssign(FoodSession session) {
+        mark.run((res, err) -> {
+            if (binding == null) return;
+            // alreadyMarked means somebody else got there first, which still leaves the
+            // colour owed, so it counts as through.
+            boolean ok = err == null && res != null && (res.ok() || res.flag("alreadyMarked"));
+            if (!ok) {
+                assigning = false;
+                binding.slotGrid.setAlpha(1f);
+                binding.confirmButton.setEnabled(true);
+                showError(err != null ? err
+                        : res == null ? getString(R.string.att_mark_failed)
+                        : res.error(getString(R.string.att_mark_failed)));
+                return;
+            }
+            marked = true;
+            setCancelable(false);
+            assignSlot(session);
+        });
+    }
+
+    private void assignSlot(FoodSession session) {
         Api.assignFoodSlot(eventId, email, session.id, (res, err) -> {
             if (binding == null) return;
             assigning = false;
             binding.slotGrid.setAlpha(1f);
+            binding.confirmButton.setEnabled(selected != null);
 
             if (err != null) {
                 showError(err);
@@ -272,10 +382,13 @@ public class FoodSlotSheet extends BottomSheetDialogFragment {
         for (int i = 0; i < sessions.size(); i++) {
             if (sessions.get(i).id.equals(updated.id)) {
                 sessions.set(i, updated);
+                // The colour that just filled up cannot stay chosen.
+                if (selected != null && selected.id.equals(updated.id)) selected = null;
                 break;
             }
         }
         renderSlots();
+        binding.confirmButton.setEnabled(selected != null);
     }
 
     private void showError(String message) {

@@ -7,13 +7,14 @@
 
     <!-- Slot picker, shown after every attendance mark -->
     <string name="food_pick_slot">Pick a food slot</string>
-    <string name="food_attendee_format">%1$s · %2$s</string>
     <string name="food_slot_full_format">%1$s full</string>
     <string name="food_slot_assigned_format">Food slot: %1$s</string>
     <string name="food_slot_taken_format">%1$s just filled up. Pick another.</string>
     <string name="food_assign_failed">Could not assign a slot</string>
     <string name="food_no_slots">No food slots are open right now.</string>
     <string name="food_close_without_slot">Close without a slot</string>
+    <string name="food_mark_attendance">Mark attendance</string>
+    <string name="food_assign_slot">Assign food slot</string>
 
     <!-- Counter stats header -->
     <string name="food_served_label">Served</string>

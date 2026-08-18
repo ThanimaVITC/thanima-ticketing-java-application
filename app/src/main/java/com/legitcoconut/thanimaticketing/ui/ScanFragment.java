@@ -52,6 +52,12 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     private String eventId;
     private Handler handler;
+    /**
+     * Whether this event hands out food colours, learned once on open so a plain event never
+     * pays for the extra lookups. A scan that beats the answer marks outright and picks the
+     * colour afterwards, which is the old behaviour and loses nothing.
+     */
+    private boolean foodRunning;
 
     @Nullable
     @Override
@@ -74,6 +80,11 @@ public class ScanFragment extends Fragment {
 
         binding.grantAccess.setOnClickListener(v -> requestCameraAndStart());
         binding.torch.setOnClickListener(v -> toggleTorch());
+
+        Api.getFoodSessions(eventId, (sessions, error) -> {
+            if (binding == null) return;
+            foodRunning = error == null && !sessions.isEmpty();
+        });
 
         if (((MainActivity) requireActivity()).hasCamera()) {
             showScanner();
@@ -122,7 +133,18 @@ public class ScanFragment extends Fragment {
     private void onQr(String value) {
         if (binding == null) return;
         binding.scanner.pauseScanning();
-        Api.verifyQrAttendance(value, eventId, (res, error) -> {
+        // On a food event the colour comes first, so nothing is marked until a slot is
+        // picked and backing out of the picker leaves the ticket untouched.
+        if (foodRunning) {
+            askSlotThenMark(value);
+        } else {
+            markNow(value);
+        }
+    }
+
+    /** The one call path: marks and reads the food block back off the same response. */
+    private void markNow(String qr) {
+        Api.verifyQrAttendance(qr, eventId, (res, error) -> {
             if (binding == null) return;
             if (error != null) {
                 showFailure(error);
@@ -132,15 +154,61 @@ public class ScanFragment extends Fragment {
                 JSONObject attendance = res.obj("attendance");
                 showSuccess(attendance);
                 offerFoodSlot(res, attendance.optString("name"), attendance.optString("regNo"),
-                        attendance.optString("email"));
+                        attendance.optString("email"), attendance.optString("phone"));
             } else {
                 showFailure(res.error(getString(R.string.scan_verification_failed)));
                 // Already marked, but possibly still without a colour — the food block rides
                 // along on the 409 precisely so a re-scan can finish the job.
                 JSONObject attendee = res.obj("attendee");
                 offerFoodSlot(res, attendee.optString("name"), attendee.optString("regNo"),
-                        attendee.optString("email"));
+                        attendee.optString("email"), attendee.optString("phone"));
             }
+        });
+    }
+
+    /**
+     * Reads the ticket without marking it, asks for the colour, and only then spends both.
+     * Anything that stops the picker from opening falls back to marking outright, since a
+     * food lookup must never be what holds up the door.
+     */
+    private void askSlotThenMark(String qr) {
+        Api.verifyTicket(qr, eventId, (ticket, error) -> {
+            if (binding == null) return;
+            if (error != null) {
+                showFailure(error);
+                return;
+            }
+            // Already present: that mark cannot be taken back, so the after-the-fact path
+            // collects whatever colour they are still owed.
+            if (ticket.hasAttended) {
+                markNow(qr);
+                return;
+            }
+            // Fetched per scan rather than reused, so the seat counts on the circles are
+            // the server's and not this screen's memory of them.
+            Api.getFoodSessions(eventId, (sessions, sessionsError) -> {
+                if (binding == null) return;
+                if (sessionsError != null || sessions.isEmpty()) {
+                    markNow(qr);
+                    return;
+                }
+                boolean shown = FoodSlotSheet.showBeforeMark(getParentFragmentManager(), eventId,
+                        sessions, ticket.name, ticket.regNo, ticket.email, ticket.phone,
+                        done -> Api.verifyQrAttendance(qr, eventId, (res, markError) -> {
+                            // Painted behind the sheet, so it is already there when it closes.
+                            if (binding != null && res != null && res.ok()) {
+                                renderSuccess(res.obj("attendance"));
+                            }
+                            done.done(res, markError);
+                        }),
+                        this::showAssignedColour,
+                        marked -> {
+                            if (binding == null) return;
+                            if (!marked) showCancelled();
+                            handler.postDelayed(this::hideAndResume, marked ? 1500 : 1200);
+                        });
+                if (!shown) markNow(qr);
+            });
         });
     }
 
@@ -149,23 +217,31 @@ public class ScanFragment extends Fragment {
      * camera stays paused for as long as the picker is up, otherwise the next ticket in the
      * queue would be read straight through the sheet.
      */
-    private void offerFoodSlot(Res res, String name, String regNo, String email) {
+    private void offerFoodSlot(Res res, String name, String regNo, String email, String phone) {
         boolean shown = FoodSlotSheet.showIfNeeded(getParentFragmentManager(), eventId,
-                res.data.optJSONObject("food"), name, regNo, email,
-                (colorName, colorInt) -> {
-                    if (binding == null) return;
-                    binding.resultMeta.setText(getString(R.string.food_slot_assigned_format, colorName));
-                    binding.resultMeta.setTextColor(colorInt);
-                    binding.resultMeta.setVisibility(View.VISIBLE);
-                },
-                () -> {
+                res.data.optJSONObject("food"), name, regNo, email, phone,
+                this::showAssignedColour,
+                marked -> {
                     if (binding == null) return;
                     handler.postDelayed(this::hideAndResume, 1500);
                 });
         if (shown) handler.removeCallbacksAndMessages(null);
     }
 
+    private void showAssignedColour(String colorName, int colorInt) {
+        if (binding == null) return;
+        binding.resultMeta.setText(getString(R.string.food_slot_assigned_format, colorName));
+        binding.resultMeta.setTextColor(colorInt);
+        binding.resultMeta.setVisibility(View.VISIBLE);
+    }
+
     private void showSuccess(JSONObject attendance) {
+        renderSuccess(attendance);
+        handler.postDelayed(this::hideAndResume, 3000);
+    }
+
+    /** The card on its own. The picker path holds the timer until the sheet is gone. */
+    private void renderSuccess(JSONObject attendance) {
         binding.scanner.setHint(null);
         Ui.feedback(requireContext(), true);
         binding.scanner.flash(true);
@@ -183,7 +259,24 @@ public class ScanFragment extends Fragment {
         binding.resultMessage.setVisibility(View.GONE);
 
         Ui.pop(binding.resultCard);
-        handler.postDelayed(this::hideAndResume, 3000);
+    }
+
+    /** Backed out of the picker, so the ticket was never spent. */
+    private void showCancelled() {
+        Ui.feedback(requireContext(), false);
+        int icon = MaterialColors.getColor(binding.getRoot(),
+                com.google.android.material.R.attr.colorOnSurfaceVariant);
+        int bg = MaterialColors.getColor(binding.getRoot(),
+                com.google.android.material.R.attr.colorSurfaceVariant);
+        styleResultHeader(R.drawable.ic_info, icon, bg, getString(R.string.scan_cancelled));
+
+        binding.resultName.setVisibility(View.GONE);
+        binding.resultRegNo.setVisibility(View.GONE);
+        binding.resultMeta.setVisibility(View.GONE);
+        binding.resultMessage.setText(R.string.scan_cancelled_detail);
+        binding.resultMessage.setVisibility(View.VISIBLE);
+
+        Ui.pop(binding.resultCard);
     }
 
     private void showFailure(String error) {

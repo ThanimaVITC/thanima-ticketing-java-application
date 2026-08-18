@@ -27,6 +27,10 @@
     <string name="pool_add_failed">Could not add this person to the pool</string>
     <string name="pool_remove_failed">Could not remove this entry</string>
 
+    <!-- ID card shown on the confirm step -->
+    <string name="id_campus">CHENNAI CAMPUS</string>
+    <string name="id_footer">THANIMA VITC</string>
+
     <!-- Pool history -->
     <string name="pool_entered_label">Entered %1$s</string>
     <string name="pool_in_at">In %1$s</string>

@@ -12,7 +12,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.Fragment;
 
@@ -67,7 +66,7 @@ public class VerifyTicketFragment extends Fragment {
         binding.torch.setOnClickListener(v -> toggleTorch());
         binding.scanAgain.setOnClickListener(v -> {
             if (binding == null) return;
-            Ui.fadeOut(binding.resultCard);
+            Ui.fadeOut(binding.resultPanel);
             binding.scanner.resumeScanning();
             binding.scanner.setHint(getString(R.string.point_at_qr));
         });
@@ -134,45 +133,24 @@ public class VerifyTicketFragment extends Fragment {
         Ui.feedback(requireContext(), true);
         binding.scanner.flash(true);
 
-        int primary = MaterialColors.getColor(binding.getRoot(),
-                com.google.android.material.R.attr.colorPrimary);
-        int neutralBg = MaterialColors.getColor(binding.getRoot(),
-                com.google.android.material.R.attr.colorSurfaceVariant);
-        styleResultHeader(R.drawable.ic_verified, primary, neutralBg, getString(R.string.ticket_valid));
-
-        binding.resultName.setText(ticket.name);
-        binding.resultRegNo.setText(ticket.regNo);
-        binding.resultEmail.setText(ticket.email);
-        if (TextUtils.isEmpty(ticket.phone)) {
-            binding.resultPhoneRow.setVisibility(View.GONE);
-        } else {
-            binding.resultPhone.setText(ticket.phone);
-            binding.resultPhoneRow.setVisibility(View.VISIBLE);
-        }
-        binding.resultEvent.setText(ticket.eventTitle);
+        Ui.fillIdCard(binding.idCard, ticket.name, ticket.regNo, ticket.phone);
+        binding.idCard.getRoot().setVisibility(View.VISIBLE);
 
         if (ticket.hasAttended) {
-            int c = ContextCompat.getColor(requireContext(), R.color.scan_success);
-            binding.statusIcon.setImageResource(R.drawable.ic_check_circle);
-            ImageViewCompat.setImageTintList(binding.statusIcon, ColorStateList.valueOf(c));
-            binding.statusText.setText(R.string.already_marked);
-            binding.statusText.setTextColor(c);
-            binding.statusMeta.setText(Ui.formatDateTime(ticket.attendedAt));
-            binding.statusMeta.setVisibility(View.VISIBLE);
+            setStatus(R.drawable.ic_check_circle,
+                    ContextCompat.getColor(requireContext(), R.color.scan_success),
+                    getString(R.string.already_marked), Ui.formatDateTime(ticket.attendedAt));
         } else {
-            int c = MaterialColors.getColor(binding.getRoot(),
-                    com.google.android.material.R.attr.colorOnSurfaceVariant);
-            binding.statusIcon.setImageResource(R.drawable.ic_info);
-            ImageViewCompat.setImageTintList(binding.statusIcon, ColorStateList.valueOf(c));
-            binding.statusText.setText(R.string.scan_not_marked);
-            binding.statusText.setTextColor(c);
-            binding.statusMeta.setVisibility(View.GONE);
+            setStatus(R.drawable.ic_info, MaterialColors.getColor(binding.getRoot(),
+                            com.google.android.material.R.attr.colorOnSurfaceVariant),
+                    getString(R.string.scan_not_marked), null);
         }
 
+        binding.resultEmail.setText(ticket.email);
+        binding.resultEvent.setText(ticket.eventTitle);
         binding.ticketDetails.setVisibility(View.VISIBLE);
-        binding.resultMessage.setVisibility(View.GONE);
 
-        Ui.pop(binding.resultCard);
+        Ui.pop(binding.resultPanel);
     }
 
     private void showFailure(String error) {
@@ -180,25 +158,23 @@ public class VerifyTicketFragment extends Fragment {
         Ui.feedback(requireContext(), false);
         binding.scanner.flash(false);
 
-        int icon = MaterialColors.getColor(binding.getRoot(),
-                com.google.android.material.R.attr.colorOnErrorContainer);
-        int bg = MaterialColors.getColor(binding.getRoot(),
-                com.google.android.material.R.attr.colorErrorContainer);
-        styleResultHeader(R.drawable.ic_error, icon, bg, getString(R.string.scan_verification_failed));
-
+        // No card without a ticket to build it from, so the failure stands on its own.
+        binding.idCard.getRoot().setVisibility(View.GONE);
         binding.ticketDetails.setVisibility(View.GONE);
-        binding.resultMessage.setText(error);
-        binding.resultMessage.setVisibility(View.VISIBLE);
+        setStatus(R.drawable.ic_error,
+                MaterialColors.getColor(binding.getRoot(), com.google.android.material.R.attr.colorError),
+                TextUtils.isEmpty(error) ? getString(R.string.scan_verification_failed) : error, null);
 
-        Ui.pop(binding.resultCard);
+        Ui.pop(binding.resultPanel);
     }
 
-    private void styleResultHeader(@DrawableRes int drawable, int iconColor, int bgColor, String title) {
-        binding.resultIcon.setImageResource(drawable);
-        ImageViewCompat.setImageTintList(binding.resultIcon, ColorStateList.valueOf(iconColor));
-        ViewCompat.setBackgroundTintList(binding.resultIcon, ColorStateList.valueOf(bgColor));
-        binding.resultTitle.setText(title);
-        binding.resultTitle.setTextColor(iconColor);
+    private void setStatus(@DrawableRes int icon, int color, String text, @Nullable String meta) {
+        binding.statusIcon.setImageResource(icon);
+        ImageViewCompat.setImageTintList(binding.statusIcon, ColorStateList.valueOf(color));
+        binding.statusText.setText(text);
+        binding.statusText.setTextColor(color);
+        binding.statusMeta.setVisibility(meta == null ? View.GONE : View.VISIBLE);
+        binding.statusMeta.setText(meta);
     }
 
     @Override

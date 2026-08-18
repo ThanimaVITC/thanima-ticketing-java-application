@@ -28,6 +28,7 @@
     <string name="unpaid">Unpaid</string>
     <string name="actions">Actions</string>
     <string name="scan_qr">Scan QR</string>
+    <string name="qr_attendance">QR Attendance</string>
     <string name="scan_qr_sub">Mark attendance by ticket</string>
     <string name="verify_ticket">Verify ticket</string>
     <string name="verify_ticket_sub">Look up without marking</string>

@@ -90,6 +90,8 @@ public class PoolScanFragment extends Fragment {
         binding.toolbar.setSubtitle(eventTitle);
 
         binding.btnConfirm.setText(removing() ? R.string.pool_remove_action : R.string.pool_add_action);
+        binding.btnConfirm.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(
+                requireContext(), removing() ? R.color.action_remove : R.color.action_add)));
         binding.btnCancelScan.setText(R.string.cancel);
         binding.btnScanAnother.setText(removing() ? R.string.pool_remove_another : R.string.pool_add_another);
 
@@ -225,7 +227,7 @@ public class PoolScanFragment extends Fragment {
     /** Adding: identity from the ticket, plus whether they were marked present. */
     private void renderTicket(Ticket t) {
         if (binding == null) return;
-        fillIdentity(t.name, t.regNo, t.email, t.phone);
+        fillIdentity(t.name, t.regNo, t.phone);
 
         int color = t.hasAttended
                 ? ContextCompat.getColor(requireContext(), R.color.scan_success)
@@ -239,7 +241,7 @@ public class PoolScanFragment extends Fragment {
         if (binding == null) return;
         entryId = entry.optString("_id", null);
         fillIdentity(entry.optString("name", ""), entry.optString("regNo", ""),
-                entry.optString("email", ""), entry.optString("phone", ""));
+                entry.optString("phone", ""));
 
         int color = MaterialColors.getColor(binding.getRoot(),
                 com.google.android.material.R.attr.colorOnSurfaceVariant);
@@ -247,16 +249,8 @@ public class PoolScanFragment extends Fragment {
                 Ui.formatDuration(entry.optLong("durationMs", 0L))));
     }
 
-    private void fillIdentity(String name, String regNo, String email, String phone) {
-        binding.tvConfirmName.setText(name);
-        binding.tvConfirmRegNo.setText(regNo);
-        binding.tvConfirmEmail.setText(email);
-        if (phone == null || phone.isEmpty()) {
-            binding.tvConfirmPhone.setVisibility(View.GONE);
-        } else {
-            binding.tvConfirmPhone.setVisibility(View.VISIBLE);
-            binding.tvConfirmPhone.setText(phone);
-        }
+    private void fillIdentity(String name, String regNo, String phone) {
+        Ui.fillIdCard(binding.idCard, name, regNo, phone);
     }
 
     private void setStatusLine(int iconRes, int color, String text) {

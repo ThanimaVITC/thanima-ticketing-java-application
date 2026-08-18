@@ -36,4 +36,17 @@
     <color name="on_scan_warn_container">#261A00</color>
 
     <color name="scrim_camera">#99000000</color>
+
+    <!-- Printed ID card in the pool confirm step. Same in both themes on purpose. -->
+    <color name="id_card_bg">#FCFCFA</color>
+    <color name="id_card_ink">#101010</color>
+    <color name="id_card_name">#1B4FA8</color>
+    <color name="id_card_band">#123C9B</color>
+    <color name="id_card_band_text">#FFFFFF</color>
+
+    <!-- Confirm actions carry their own meaning, so they opt out of dynamic colour. -->
+    <color name="action_add">#146C2E</color>
+    <color name="action_remove">#B3261E</color>
+    <color name="action_on_confirm">#FFFFFF</color>
+    <color name="action_scan_again">#123C9B</color>
 </resources>
